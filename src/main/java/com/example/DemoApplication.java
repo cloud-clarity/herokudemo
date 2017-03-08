@@ -15,6 +15,6 @@ public class DemoApplication {
 
 	@GetMapping("/")
 	public String test() {
-		return "Hello Heroku test";
+		return "Hello Heroku test!";
 	}
 }
