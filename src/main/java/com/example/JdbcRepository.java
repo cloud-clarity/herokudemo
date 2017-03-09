@@ -5,12 +5,17 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class JdbcRepository implements Repository {
 
     @Autowired
     private DataSource dataSource;
+
+    //   CREATE TABLE hello(id SERIAL, text VARCHAR(255))
+    //   INSERT INTO hello (id,text) VALUES (1,'Heeelllooooouuu!!!!');
 
 
     @Override
@@ -22,6 +27,19 @@ public class JdbcRepository implements Repository {
                 if (!rs.next()) throw new Exception("No repository with ID " + helloId);
                 else return rsHello(rs);
             }
+        } catch (SQLException e) {
+            throw new Exception(e);
+        }
+    }
+
+    @Override
+    public List<Hello> listHellos() throws Exception {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, text FROM hello")) {
+            List<Hello> blogs = new ArrayList<>();
+            while (rs.next()) blogs.add(rsHello(rs));
+            return blogs;
         } catch (SQLException e) {
             throw new Exception(e);
         }
@@ -39,6 +57,6 @@ public class JdbcRepository implements Repository {
 
 
     private Hello rsHello(ResultSet rs) throws SQLException {
-        return new Hello(rs.getLong("id"), rs.getString("title"));
+        return new Hello(rs.getLong("id"), rs.getString("text"));
     }
 }
